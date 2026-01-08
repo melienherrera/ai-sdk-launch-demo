@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "@temporalio/ai-sdk": "^1.14.0"
+  }
+}

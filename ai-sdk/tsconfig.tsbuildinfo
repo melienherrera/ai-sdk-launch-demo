@@ -1,0 +1,1 @@
+{"root":["./src/activities.ts","./src/client.ts","./src/mcp-server.ts","./src/non-temporal.ts","./src/worker.ts","./src/workflows.ts","./src/mocha/activities.test.ts","./src/mocha/workflows.test.ts"],"version":"5.9.3"}
