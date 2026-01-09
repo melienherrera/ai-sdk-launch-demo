@@ -1,0 +1,1 @@
+{"root":["./src/client.ts","./src/mcp-server.ts","./src/shared.ts","./src/worker.ts","./src/activities/briefing.ts","./src/activities/hello-world.ts","./src/mocha/activities.test.ts","./src/mocha/workflows.test.ts","./src/workflows/hello-world-workflow.ts","./src/workflows/index.ts","./src/workflows/news-briefing-workflow.ts"],"version":"5.9.3"}
