@@ -2,8 +2,6 @@ import { NativeConnection, Worker } from '@temporalio/worker';
 import * as activities from './activities';
 import { AiSdkPlugin } from '@temporalio/ai-sdk';
 import { openai } from '@ai-sdk/openai';
-import { experimental_createMCPClient as createMCPClient } from '@ai-sdk/mcp';
-import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
 
 async function run() {
   const connection = await NativeConnection.connect({

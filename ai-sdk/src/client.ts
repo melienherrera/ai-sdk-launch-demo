@@ -8,8 +8,8 @@ async function run() {
   const defaultTopics = [
     'TypeScript and JavaScript updates',
     'AI and LLM developments',
-    'Cloud infrastructure news',
-    'Developer tools releases',
+    'Durable Execution news',
+    'New AI developer tools releases',
   ];
   
   // Get topics from CLI arguments (everything after the script name)
@@ -32,10 +32,17 @@ async function run() {
     workflowId: 'workflow-' + nanoid(),
   });
 
-  console.log(`Started workflow ${handle.workflowId}`);
+  console.log(`🔧 Started workflow ${handle.workflowId}`);
 
   // optional: wait for workflow result
-  console.log(await handle.result()); // Hello, Temporal!
+  console.log('\n\n╔════════════════════════════════════════════════════════════╗');
+  console.log('║          📰  DAILY TECH BRIEFING                           ║');
+  console.log('╚════════════════════════════════════════════════════════════╝\n');
+  console.log(`📅 Date: ${(await handle.result()).date}`);
+  console.log(`📊 Topics Covered: ${(await handle.result()).topics.length}`);
+  console.log(`🔗 Sources Referenced: ${(await handle.result()).totalSources}`);
+  console.log('\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
+  console.log((await handle.result()).briefingText); // Hello, Temporal!
 
 }
 
