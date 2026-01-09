@@ -1,58 +1,50 @@
 import '@temporalio/ai-sdk/lib/load-polyfills';
-import { generateText, tool, stepCountIs } from 'ai';
-import { temporalProvider } from '@temporalio/ai-sdk';
 import type * as activities from './activities';
 import { proxyActivities } from '@temporalio/workflow';
-import z from 'zod';
+import { DailyBriefing } from './shared';
 
-const { getWeather, calculateAreaOfCircle } = proxyActivities<typeof activities>({
-  startToCloseTimeout: '1 minute',
+const { searchTopicActivity, summarizeTopicActivity, generateBriefingActivity } = proxyActivities<typeof activities>({
+  startToCloseTimeout: '3 minutes',
   retry: {
     maximumAttempts: 3,
+    initialInterval: '2s',
+    backoffCoefficient: 2,
+    maximumInterval: '30s',
   },
 });
 
-
-export async function haikuAgent(prompt: string): Promise<string> {
-  const result = await generateText({
-    model: temporalProvider.languageModel('gpt-4o-mini'),
-    prompt,
-    system: 'You only respond in haikus.',
-  });
-  return result.text;
-}
-
-export async function toolsAgent(question: string): Promise<string> {
-  const result = await generateText({
-    model: temporalProvider.languageModel('gpt-4o-mini'),
-    prompt: question,
-    system: 'You are a helpful agent.',
-    tools: {
-      getWeather: tool({
-        description: 'Get the weather for a given city',
-        inputSchema: z.object({
-          location: z.string().describe('The location to get the weather for'),
-        }),
-        execute: getWeather,
-      }),
-      calculateAreaOfCircle: tool({
-        description: 'Calculate the area of a circle',
-        inputSchema: z.object({
-          radius: z.number().describe('The radius of the circle'),
-        }),
-        execute: calculateAreaOfCircle,
-      }),
-    },
-    stopWhen: stepCountIs(5),
-  });
-  return result.text;
-}
-
-export async function chainOfThoughtAgent(question: string): Promise<string> {
-  const result = await generateText({
-    model: temporalProvider.languageModel('gpt-4o-mini'),
-    prompt: question,
-    system: 'You are a helpful agent.',
-  });
-  return result.text;
-}
+// ==========================================
+// MAIN WORKFLOW: Orchestrates all steps
+// ==========================================
+export async function dailyBriefingWorkflow(topics: string[]): Promise<DailyBriefing> {
+  console.log(`\n🚀 Starting Daily Tech Briefing Generation`);
+  console.log(`📋 Topics: ${topics.join(', ')}\n`);
+  
+  // PHASE 1: Search all topics (in parallel)
+  console.log(`\n━━━ PHASE 1: Searching Topics ━━━`);
+  const searchResults = await Promise.all(
+    topics.map(topic => searchTopicActivity(topic))
+  );
+  
+  const totalSources = searchResults.reduce((acc, r) => acc + (r.sources?.length || 0), 0);
+  console.log(`\n✅ Phase 1 Complete: Found ${totalSources} sources across ${topics.length} topics`);
+  
+  // PHASE 2: Summarize all findings (in parallel)
+  console.log(`\n━━━ PHASE 2: Summarizing Findings ━━━`);
+  const summaries = await Promise.all(
+    searchResults.map(result => summarizeTopicActivity(result))
+  );
+  console.log(`\n✅ Phase 2 Complete: Summarized all topics`);
+  
+  // PHASE 3: Generate final briefing
+  console.log(`\n━━━ PHASE 3: Generating Briefing ━━━`);
+  const briefingText = await generateBriefingActivity(summaries);
+  console.log(`\n✅ Phase 3 Complete: Final briefing ready`);
+  
+  return {
+    date: new Date().toISOString().split('T')[0],
+    topics: summaries,
+    briefingText,
+    totalSources,
+  };  
+} 

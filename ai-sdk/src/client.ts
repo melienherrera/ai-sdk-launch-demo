@@ -1,39 +1,36 @@
 import { Connection, Client } from '@temporalio/client';
 import { loadClientConnectConfig } from '@temporalio/envconfig';
-import { haikuAgent, toolsAgent} from './workflows';
+import { dailyBriefingWorkflow } from './workflows';
 import { nanoid } from 'nanoid';
 
 async function run() {
 
-  const args = process.argv;
-  const workflow = args[2] ?? 'haiku';
-  const user_prompt = args[3] || 'Tell me about recursion';
+  const defaultTopics = [
+    'TypeScript and JavaScript updates',
+    'AI and LLM developments',
+    'Cloud infrastructure news',
+    'Developer tools releases',
+  ];
+  
+  // Get topics from CLI arguments (everything after the script name)
+  const cliTopics = process.argv.slice(2);
+  const topics = cliTopics.length > 0 ? cliTopics : defaultTopics;
+  
+  if (cliTopics.length > 0) {
+    console.log(`\n📝 Using custom topics from CLI: ${topics.length} topic(s)`);
+  } else {
+    console.log(`\n📝 Using default topics (pass custom topics as arguments to override)`);
+  }
 
   const config = loadClientConnectConfig();
   const connection = await Connection.connect(config.connectionOptions);
   const client = new Client({ connection });
 
-  let handle;
-  switch (workflow) {
-    case 'haiku':
-      console.log("Generating haiku...");
-      console.log("--------------------------------");
-      handle = await client.workflow.start(haikuAgent, {
-        taskQueue: 'ai-sdk',
-        args: [user_prompt],
-        workflowId: 'workflow-' + nanoid(),
-      });
-      break;
-    case 'agent':
-      handle = await client.workflow.start(toolsAgent, {
-        taskQueue: 'ai-sdk',
-        args: ['What is the weath er in Tokyo?'],
-        workflowId: 'workflow-' + nanoid(),
-      });
-      break;
-    default:
-      throw new Error('Unknown workflow type: ' + workflow);
-  }
+  const handle = await client.workflow.start(dailyBriefingWorkflow, {
+    taskQueue: 'ai-sdk',
+    args: [topics],
+    workflowId: 'workflow-' + nanoid(),
+  });
 
   console.log(`Started workflow ${handle.workflowId}`);
 

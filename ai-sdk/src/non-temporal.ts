@@ -46,11 +46,13 @@ export async function toolsAgent(question: string): Promise<string> {
           }),
           execute: calculateAreaOfCircle,
         }),
+        web_search: openai.tools.webSearch({})
       },
       stopWhen: stepCountIs(5),
     });
     return result.text;
   }
+
 
 async function main() {
   const option = process.argv[2] || 'haiku';
