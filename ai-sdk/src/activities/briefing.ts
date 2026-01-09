@@ -1,6 +1,6 @@
 import { openai } from '@ai-sdk/openai';
 import { generateText } from 'ai';
-import { TopicSearchResult } from './shared';
+import { TopicSearchResult } from '../shared';
 
 // Activity that uses a web search news on a specific topic
 export async function searchTopicActivity(topic: string): Promise<TopicSearchResult> {
@@ -26,5 +26,4 @@ export async function searchTopicActivity(topic: string): Promise<TopicSearchRes
       timestamp: new Date(),
     };
   }
-  
   

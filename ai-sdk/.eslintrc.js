@@ -9,6 +9,7 @@ module.exports = {
     project: './tsconfig.json',
     tsconfigRootDir: __dirname,
   },
+  ignorePatterns: ['non-temporal/**/*'],
   plugins: ['@typescript-eslint', 'deprecation'],
   extends: [
     'eslint:recommended',

@@ -1,7 +1,9 @@
 import { NativeConnection, Worker } from '@temporalio/worker';
-import * as activities from './activities';
+import * as briefingActivities from './activities/briefing';
+import * as helloWorldActivities from './activities/hello-world';
 import { AiSdkPlugin } from '@temporalio/ai-sdk';
 import { openai } from '@ai-sdk/openai';
+import path from 'path';
 
 async function run() {
   const connection = await NativeConnection.connect({
@@ -18,8 +20,12 @@ async function run() {
       namespace: 'default',
       taskQueue: 'ai-sdk',
       // Workflows are registered using a path as they run in a separate JS context.
-      workflowsPath: require.resolve('./workflows'),
-      activities,
+      // When workflows is a directory, point to it directly
+      workflowsPath: path.join(__dirname, 'workflows'),
+      activities: {
+        ...briefingActivities,
+        ...helloWorldActivities,
+      },
     });
 
     await worker.run();

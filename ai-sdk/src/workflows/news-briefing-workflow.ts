@@ -1,8 +1,8 @@
 import '@temporalio/ai-sdk/lib/load-polyfills';
-import type * as activities from './activities';
+import type * as activities from '../activities/briefing';
 import { proxyActivities } from '@temporalio/workflow';
 import { generateText } from 'ai';
-import { DailyBriefing, TopicSummary, TopicSearchResult } from './shared';
+import { DailyBriefing, TopicSummary, TopicSearchResult } from '../shared';
 import {temporalProvider} from '@temporalio/ai-sdk';
 
 const { searchTopicActivity } = proxyActivities<typeof activities>({
@@ -78,6 +78,8 @@ export async function generateBriefing(summaries: TopicSummary[]): Promise<strin
              Write in a professional but conversational tone. Start with an opening that ties themes to what 
              matters for Temporal's AI and durable execution narrative. Present each topic's information through 
              this lens, then conclude with key takeaways for someone building production-ready AI systems.
+
+             This is not a letter. This is just a briefing and personal search findings for the day.
              
              Topic Summaries:
              ${summariesText}`,

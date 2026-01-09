@@ -1,17 +1,48 @@
-# AI Sdk
+# AI SDK Demo
 
-This project demonstrates some uses of the AI SDK inside Temporal.
+This project demonstrates the AI SDK in both vanilla (non-temporal) and Temporal-powered implementations.
 
-### Setup
+## Setup
 
-1. `temporal server start-dev` to start [Temporal Server](https://github.com/temporalio/cli/#installation).
-1. `npm install` to install dependencies.
-1. `export OPENAI_API_KEY=<KEY>`
-1. `npm run start.watch` to start the Worker.
+1. Install dependencies: `npm install`
+2. Set your API key: `export OPENAI_API_KEY=<your-key>`
 
-### Run the samples
+## Vanilla AI SDK
 
-1. `npm run workflow haiku`
-1. `npm run workflow tools`
-1. `npm run workflow mcp`
-1. `npm run workflow middleware`
+Run standalone examples without Temporal:
+
+```bash
+npm run non-temporal:hello-world  # Basic AI SDK example
+npm run non-temporal:briefing     # Web search briefing
+```
+
+## Temporal + AI SDK
+
+For durable, recoverable AI workflows:
+
+### 1. Start Temporal Server
+
+```bash
+temporal server start-dev
+```
+
+### 2. Start the Worker
+
+```bash
+npm run start.watch
+```
+
+### 3. Run Workflows
+
+In a separate terminal:
+
+```bash
+npm run workflow:haiku     # Generate a haiku
+npm run workflow:agent     # Agent with tools
+npm run workflow:briefing  # News briefing workflow
+```
+
+## Key Differences
+
+- **Vanilla**: Simple, direct AI SDK usage
+- **Temporal**: Durable execution, retries, observability, and recovery across failures
