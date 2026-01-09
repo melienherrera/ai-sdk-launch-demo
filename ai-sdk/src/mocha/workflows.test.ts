@@ -1,8 +1,8 @@
 import { TestWorkflowEnvironment } from '@temporalio/testing';
 import { before, describe, it } from 'mocha';
 import { Worker } from '@temporalio/worker';
-import { haikuAgent } from '../workflows';
-import * as activities from '../activities';
+import { haikuAgent } from '../workflows/news-briefing-workflow';
+import * as activities from '../activities/briefing';
 
 describe('Example workflow', () => {
   let testEnv: TestWorkflowEnvironment;

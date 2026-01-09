@@ -11,8 +11,12 @@
     "start": "ts-node src/worker.ts",
     "start.watch": "nodemon src/worker.ts",
     "workflow": "ts-node src/client.ts",
+    "workflow:haiku": "ts-node src/client.ts haiku",
+    "workflow:agent": "ts-node src/client.ts agent",
+    "workflow:briefing": "ts-node src/client.ts briefing",
     "test": "mocha --exit --require ts-node/register --require source-map-support/register src/mocha/*.test.ts",
-    "non-temporal": "ts-node src/non-temporal.ts"
+    "non-temporal:hello-world": "ts-node non-temporal/hello-world.ts",
+    "non-temporal:briefing": "ts-node non-temporal/web-search.ts"
   },
   "nodemonConfig": {
     "execMap": {

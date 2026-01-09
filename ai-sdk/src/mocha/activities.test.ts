@@ -1,6 +1,6 @@
 import { MockActivityEnvironment } from '@temporalio/testing';
 import { describe, it } from 'mocha';
-import * as activities from '../activities';
+import * as activities from '../activities/briefing';
 import assert from 'assert';
 
 describe('greet activity', async () => {
