@@ -4,7 +4,10 @@ This project demonstrates the AI SDK in both vanilla (non-temporal) and Temporal
 
 ## Setup
 
-1. Install dependencies: `npm install`
+1. Install dependencies:
+   ```bash
+   cd ai-sdk && npm install
+   ```
 2. Set your API key: `export OPENAI_API_KEY=<your-key>`
 
 ## Vanilla AI SDK
