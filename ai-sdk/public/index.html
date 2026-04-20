@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Daily Tech Briefing Generator</title>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <style>
     * {
       margin: 0;
@@ -195,12 +196,33 @@
 
     .briefing-text {
       line-height: 1.8;
-      white-space: pre-wrap;
       margin-bottom: 30px;
       padding: 20px;
       background: #fafafa;
       border-radius: 8px;
       border-left: 4px solid #667eea;
+    }
+
+    .briefing-text h1, .briefing-text h2, .briefing-text h3 {
+      margin: 16px 0 8px;
+      color: #333;
+    }
+
+    .briefing-text p {
+      margin-bottom: 12px;
+    }
+
+    .briefing-text ul, .briefing-text ol {
+      padding-left: 24px;
+      margin-bottom: 12px;
+    }
+
+    .briefing-text li {
+      margin: 4px 0;
+    }
+
+    .briefing-text strong {
+      color: #333;
     }
 
     .topic-summaries {
@@ -371,7 +393,7 @@
       document.getElementById('resultDate').textContent = result.date;
       document.getElementById('resultTopicsCount').textContent = result.topics.length;
       document.getElementById('resultSourcesCount').textContent = result.totalSources;
-      document.getElementById('resultText').textContent = result.briefingText;
+      document.getElementById('resultText').innerHTML = marked.parse(result.briefingText);
 
       const summariesList = document.getElementById('topicSummariesList');
       summariesList.innerHTML = '';
