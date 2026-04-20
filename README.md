@@ -42,6 +42,16 @@ npm run workflow:agent     # Agent with tools
 npm run workflow:briefing  # News briefing workflow
 ```
 
+### 4. Run the Briefing Web UI (optional)
+
+In a third terminal:
+
+```bash
+npm run server
+```
+
+Then open **http://localhost:3000** in your browser. Enter topics, hit Generate, and the briefing will appear when the workflow completes.
+
 ## Key Differences
 
 - **Vanilla**: Simple, direct AI SDK usage
