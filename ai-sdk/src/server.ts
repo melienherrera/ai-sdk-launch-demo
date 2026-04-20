@@ -55,11 +55,6 @@ async function runVanillaWorkflow(jobId: string, topics: string[]) {
     const searchResults = await Promise.all(topics.map(t => searchTopic(t)));
     job.progress.phases[0].status = 'completed';
 
-    // Simulate a crash after Phase 1 — demonstrates that without Temporal,
-    // all progress is lost and the workflow must restart from scratch.
-    console.log('\n💥 Vanilla workflow crashed after Phase 1 — all progress lost!\n');
-    throw new Error('Simulated crash: unhandled exception mid-workflow. All progress lost — must restart from scratch.');
-
     // Phase 2
     job.progress.currentPhase = 2;
     job.progress.phases[1].status = 'running';
