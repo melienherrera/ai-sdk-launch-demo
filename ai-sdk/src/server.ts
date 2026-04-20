@@ -145,7 +145,7 @@ app.post('/api/briefing/start', async (req, res) => {
     }
 
     const workflowId = 'briefing-web-' + nanoid();
-    await temporalClient.workflow.start(dailyBriefingWorkflow, {
+    const handle = await temporalClient.workflow.start(dailyBriefingWorkflow, {
       taskQueue: 'ai-sdk',
       args: [validTopics],
       workflowId,
@@ -154,7 +154,7 @@ app.post('/api/briefing/start', async (req, res) => {
     console.log(`🚀 Started Temporal workflow: ${workflowId}`);
     res.json({
       workflowId,
-      temporalUiUrl: `${TEMPORAL_UI_BASE}/${workflowId}`,
+      temporalUiUrl: `${TEMPORAL_UI_BASE}/${workflowId}/${handle.firstExecutionRunId}`,
       topics: validTopics,
     });
   } catch (err: any) {

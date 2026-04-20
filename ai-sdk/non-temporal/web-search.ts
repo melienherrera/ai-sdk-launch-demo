@@ -206,7 +206,10 @@ async function main() {
   console.log('\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
 }
 
-main().catch((err) => {
-  console.error('Error:', err);
-  process.exit(1);
-});
+// Only run CLI entrypoint when executed directly, not when imported as a module
+if (require.main === module) {
+  main().catch((err) => {
+    console.error('Error:', err);
+    process.exit(1);
+  });
+}
