@@ -6,397 +6,447 @@
   <title>Daily Tech Briefing Generator</title>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       min-height: 100vh;
-      padding: 20px;
+      padding: 24px;
       color: #333;
     }
 
-    .container {
-      max-width: 900px;
-      margin: 0 auto;
-    }
-
-    .header {
+    .page-header {
       text-align: center;
       color: white;
-      margin-bottom: 30px;
-      padding: 20px;
+      margin-bottom: 24px;
     }
 
-    .header h1 {
-      font-size: 2.5em;
-      margin-bottom: 10px;
-    }
+    .page-header h1 { font-size: 2.2em; margin-bottom: 8px; }
+    .page-header p  { font-size: 1.05em; opacity: 0.9; }
 
-    .header p {
-      font-size: 1.1em;
-      opacity: 0.9;
-    }
-
-    .card {
+    /* ── Top form card ── */
+    .form-card {
       background: white;
       border-radius: 12px;
-      padding: 30px;
-      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-      margin-bottom: 20px;
+      padding: 24px 30px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+      margin-bottom: 24px;
+      max-width: 1400px;
+      margin-left: auto;
+      margin-right: auto;
     }
 
-    .form-section {
-      display: block;
-    }
-
-    .form-section.hidden {
-      display: none;
-    }
-
-    label {
+    .form-card label {
       display: block;
       font-weight: 600;
-      margin-bottom: 10px;
-      font-size: 1.1em;
+      font-size: 1.05em;
       color: #444;
+      margin-bottom: 10px;
     }
 
-    textarea {
+    .form-card textarea {
       width: 100%;
-      padding: 15px;
+      padding: 14px;
       border: 2px solid #e0e0e0;
       border-radius: 8px;
       font-size: 1em;
       font-family: inherit;
       resize: vertical;
-      transition: border-color 0.3s;
-      min-height: 150px;
+      min-height: 120px;
+      transition: border-color 0.2s;
     }
 
-    textarea:focus {
-      outline: none;
-      border-color: #667eea;
-    }
+    .form-card textarea:focus { outline: none; border-color: #667eea; }
 
-    .hint {
-      font-size: 0.9em;
-      color: #666;
-      margin-top: 8px;
-      font-style: italic;
-    }
+    .hint { font-size: 0.88em; color: #777; margin-top: 6px; font-style: italic; }
 
-    .button {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    .generate-btn {
+      margin-top: 16px;
+      width: 100%;
+      padding: 14px;
+      font-size: 1.05em;
+      font-weight: 700;
       color: white;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       border: none;
-      padding: 15px 40px;
-      font-size: 1.1em;
-      font-weight: 600;
       border-radius: 8px;
       cursor: pointer;
-      transition: transform 0.2s, box-shadow 0.2s;
-      margin-top: 20px;
-      width: 100%;
+      transition: transform 0.15s, box-shadow 0.15s;
     }
 
-    .button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+    .generate-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(102,126,234,0.4); }
+    .generate-btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; box-shadow: none; }
+
+    /* ── Two-column layout ── */
+    .columns {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      max-width: 1400px;
+      margin: 0 auto;
     }
 
-    .button:active {
-      transform: translateY(0);
+    @media (max-width: 900px) {
+      .columns { grid-template-columns: 1fr; }
     }
 
-    .button:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-      transform: none;
+    .column-card {
+      background: white;
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
     }
 
-    .loading-section {
+    /* ── Column header badges ── */
+    .column-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding-bottom: 14px;
+      border-bottom: 2px solid #f0f0f0;
+    }
+
+    .column-header h2 { font-size: 1.2em; color: #333; }
+
+    .badge {
+      font-size: 0.75em;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 20px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .badge-vanilla  { background: #fff3cd; color: #856404; }
+    .badge-temporal { background: #d1e7ff; color: #0a58ca; }
+
+    /* ── Phase tracker ── */
+    .phase-tracker { display: flex; flex-direction: column; gap: 8px; }
+
+    .phase {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 0.95em;
+      font-weight: 500;
+      background: #f8f9fa;
+      color: #888;
+      border: 1.5px solid #e9ecef;
+      transition: all 0.3s;
+    }
+
+    .phase-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      background: #dee2e6;
+      transition: background 0.3s;
+    }
+
+    .phase.running  { background: #fff8e1; color: #555; border-color: #ffe082; }
+    .phase.running .phase-dot { background: #ffc107; animation: pulse 1s infinite; }
+
+    .phase.completed { background: #e8f5e9; color: #2e7d32; border-color: #a5d6a7; }
+    .phase.completed .phase-dot { background: #43a047; }
+
+    .phase.failed { background: #fdecea; color: #c62828; border-color: #ef9a9a; }
+    .phase.failed .phase-dot { background: #e53935; }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    .retry-badge {
+      display: none;
+      margin-left: auto;
+      font-size: 0.75em;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 20px;
+      background: #fff3cd;
+      color: #856404;
+      border: 1px solid #ffe082;
+    }
+
+    /* ── Temporal meta ── */
+    .temporal-meta {
+      display: none;
+      background: #f0f4ff;
+      border: 1px solid #c8d8ff;
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-size: 0.88em;
+      color: #444;
+    }
+
+    .temporal-meta.visible { display: block; }
+
+    .temporal-meta .workflow-id {
+      font-family: 'Courier New', monospace;
+      font-size: 0.85em;
+      word-break: break-all;
+      color: #555;
+      margin-top: 4px;
+    }
+
+    .temporal-meta a {
+      color: #667eea;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .temporal-meta a:hover { text-decoration: underline; }
+
+    /* ── Spinner ── */
+    .spinner-wrap {
       display: none;
       text-align: center;
+      padding: 10px 0;
     }
 
-    .loading-section.active {
-      display: block;
-    }
+    .spinner-wrap.visible { display: block; }
 
     .spinner {
-      width: 60px;
-      height: 60px;
-      border: 5px solid #f3f3f3;
-      border-top: 5px solid #667eea;
+      width: 44px; height: 44px;
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #667eea;
       border-radius: 50%;
-      animation: spin 1s linear infinite;
-      margin: 20px auto;
+      animation: spin 0.9s linear infinite;
+      margin: 0 auto 10px;
     }
 
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
-    .loading-text {
-      font-size: 1.2em;
-      color: #555;
-      margin: 15px 0;
-      font-weight: 500;
-    }
+    .spinner-label { font-size: 0.9em; color: #777; }
 
-    .workflow-id {
-      font-size: 0.9em;
-      color: #888;
-      font-family: 'Courier New', monospace;
-      margin-top: 10px;
-    }
+    /* ── Result ── */
+    .result-section { display: none; }
+    .result-section.visible { display: block; }
 
-    .results-section {
-      display: none;
-    }
-
-    .results-section.active {
-      display: block;
-    }
-
-    .briefing-header {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      padding: 20px;
-      border-radius: 8px;
-      text-align: center;
-      margin-bottom: 20px;
-    }
-
-    .briefing-header h2 {
-      font-size: 1.8em;
-      margin: 0;
-    }
-
-    .briefing-meta {
+    .result-meta {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
       background: #f8f9fa;
-      padding: 15px;
       border-radius: 8px;
-      margin-bottom: 20px;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 10px;
+      padding: 10px 14px;
+      font-size: 0.9em;
     }
 
-    .briefing-meta p {
-      margin: 5px 0;
-      font-size: 0.95em;
-    }
+    .result-meta span { color: #555; }
+    .result-meta strong { color: #333; }
 
     .briefing-text {
       line-height: 1.8;
-      margin-bottom: 30px;
-      padding: 20px;
+      padding: 18px;
       background: #fafafa;
       border-radius: 8px;
       border-left: 4px solid #667eea;
+      font-size: 0.95em;
     }
 
-    .briefing-text h1, .briefing-text h2, .briefing-text h3 {
-      margin: 16px 0 8px;
-      color: #333;
-    }
+    .briefing-text h1, .briefing-text h2, .briefing-text h3 { margin: 14px 0 6px; color: #333; }
+    .briefing-text p   { margin-bottom: 10px; }
+    .briefing-text ul,
+    .briefing-text ol  { padding-left: 22px; margin-bottom: 10px; }
+    .briefing-text li  { margin: 3px 0; }
 
-    .briefing-text p {
-      margin-bottom: 12px;
-    }
-
-    .briefing-text ul, .briefing-text ol {
-      padding-left: 24px;
-      margin-bottom: 12px;
-    }
-
-    .briefing-text li {
-      margin: 4px 0;
-    }
-
-    .briefing-text strong {
-      color: #333;
-    }
-
-    .topic-summaries {
-      margin-top: 30px;
-      padding-top: 20px;
-      border-top: 2px solid #e0e0e0;
-    }
-
-    .topic-summaries h3 {
-      margin-bottom: 15px;
-      color: #444;
-    }
+    .topic-summaries h3 { font-size: 1em; color: #555; margin-bottom: 10px; }
 
     .topic-card {
       background: #f8f9fa;
       border-radius: 8px;
-      padding: 15px 20px;
-      margin-bottom: 15px;
+      padding: 12px 16px;
+      margin-bottom: 10px;
       border-left: 3px solid #667eea;
     }
 
-    .topic-card h4 {
-      color: #444;
-      margin-bottom: 8px;
-    }
+    .topic-card h4 { color: #444; margin-bottom: 6px; font-size: 0.95em; }
+    .topic-card p  { font-size: 0.88em; color: #555; margin-bottom: 6px; line-height: 1.5; }
+    .topic-card ul { padding-left: 18px; font-size: 0.85em; color: #555; }
+    .topic-card li { margin: 3px 0; line-height: 1.4; }
 
-    .topic-card p {
-      font-size: 0.95em;
-      color: #555;
-      margin-bottom: 8px;
-      line-height: 1.6;
-    }
-
-    .topic-card ul {
-      padding-left: 20px;
-      font-size: 0.9em;
-      color: #555;
-    }
-
-    .topic-card ul li {
-      margin: 4px 0;
-      line-height: 1.5;
-    }
-
+    /* ── Error ── */
     .error-section {
       display: none;
-      background: #fee;
-      border: 2px solid #fcc;
+      background: #fdecea;
+      border: 1.5px solid #ef9a9a;
       border-radius: 8px;
-      padding: 20px;
-      color: #c33;
+      padding: 14px 18px;
+      color: #c62828;
+      font-size: 0.92em;
     }
 
-    .error-section.active {
-      display: block;
-    }
+    .error-section.visible { display: block; }
+    .error-section strong  { display: block; margin-bottom: 4px; }
 
-    .error-section h3 {
-      margin-bottom: 10px;
-    }
-
-    .button-secondary {
-      background: #6c757d;
-      margin-top: 10px;
-    }
-
-    .button-secondary:hover {
-      background: #5a6268;
-      box-shadow: 0 5px 20px rgba(108, 117, 125, 0.4);
+    /* ── Idle placeholder ── */
+    .idle-placeholder {
+      text-align: center;
+      color: #bbb;
+      padding: 30px 0;
+      font-size: 0.95em;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="header">
-      <h1>📰 Daily Tech Briefing Generator</h1>
-      <p>Generate personalized tech briefings powered by Temporal Workflows</p>
-    </div>
 
-    <div class="card">
-      <!-- Form Section -->
-      <div id="formSection" class="form-section">
-        <label for="topicsInput">Enter Topics (one per line or comma-separated):</label>
-        <textarea
-          id="topicsInput"
-          placeholder="TypeScript and JavaScript updates&#10;AI and LLM developments&#10;Durable Execution news&#10;New AI developer tools releases"
-        ></textarea>
-        <p class="hint">Enter 1-10 topics. Each briefing takes about 1-2 minutes to generate.</p>
-        <button id="generateBtn" class="button">Generate Briefing</button>
-      </div>
-
-      <!-- Loading Section -->
-      <div id="loadingSection" class="loading-section">
-        <div class="spinner"></div>
-        <div class="loading-text">Generating your briefing...</div>
-        <p class="hint">This may take 1-2 minutes. The workflow is searching the web, summarizing findings, and generating your personalized briefing.</p>
-        <p class="workflow-id">Workflow ID: <span id="workflowIdDisplay"></span></p>
-      </div>
-
-      <!-- Error Section -->
-      <div id="errorSection" class="error-section">
-        <h3>Error</h3>
-        <p id="errorMessage"></p>
-        <button id="tryAgainBtn" class="button button-secondary">Try Again</button>
-      </div>
-
-      <!-- Results Section -->
-      <div id="resultsSection" class="results-section">
-        <div class="briefing-header">
-          <h2>📰 DAILY TECH BRIEFING</h2>
-        </div>
-        <div class="briefing-meta">
-          <p><strong>📅 Date:</strong> <span id="resultDate"></span></p>
-          <p><strong>📊 Topics Covered:</strong> <span id="resultTopicsCount"></span></p>
-          <p><strong>🔗 Sources Referenced:</strong> <span id="resultSourcesCount"></span></p>
-        </div>
-        <div class="briefing-text" id="resultText"></div>
-        <div class="topic-summaries">
-          <h3>📋 Topic Summaries</h3>
-          <div id="topicSummariesList"></div>
-        </div>
-        <button id="newBriefingBtn" class="button">Generate New Briefing</button>
-      </div>
-    </div>
+  <div class="page-header">
+    <h1>📰 Daily Tech Briefing Generator</h1>
+    <p>Compare vanilla AI SDK vs. durable Temporal-powered workflows side by side</p>
   </div>
 
-  <script>
-    const topicsInput = document.getElementById('topicsInput');
-    const generateBtn = document.getElementById('generateBtn');
-    const formSection = document.getElementById('formSection');
-    const loadingSection = document.getElementById('loadingSection');
-    const resultsSection = document.getElementById('resultsSection');
-    const errorSection = document.getElementById('errorSection');
-    const workflowIdDisplay = document.getElementById('workflowIdDisplay');
-    const errorMessage = document.getElementById('errorMessage');
-    const tryAgainBtn = document.getElementById('tryAgainBtn');
-    const newBriefingBtn = document.getElementById('newBriefingBtn');
+  <!-- Shared input form -->
+  <div class="form-card">
+    <label for="topicsInput">Enter Topics (one per line or comma-separated):</label>
+    <textarea id="topicsInput" placeholder="TypeScript and JavaScript updates&#10;AI and LLM developments&#10;Durable Execution news&#10;New AI developer tools releases"></textarea>
+    <p class="hint">Enter 1–10 topics. Both versions will run simultaneously so you can compare them.</p>
+    <button id="generateBtn" class="generate-btn">Generate Briefing</button>
+  </div>
 
-    let pollInterval = null;
+  <!-- Two columns -->
+  <div class="columns">
+
+    <!-- ── Left: Vanilla ── -->
+    <div class="column-card" id="vanillaCol">
+      <div class="column-header">
+        <span class="badge badge-vanilla">Vanilla</span>
+        <h2>AI SDK — No Orchestration</h2>
+      </div>
+
+      <div id="vanillaIdle" class="idle-placeholder">Hit Generate to start</div>
+
+      <div id="vanillaSpinner" class="spinner-wrap">
+        <div class="spinner"></div>
+        <div class="spinner-label" id="vanillaSpinnerLabel">Starting...</div>
+      </div>
+
+      <div id="vanillaPhases" class="phase-tracker" style="display:none">
+        <div class="phase pending" id="vanilla-phase-1"><span class="phase-dot"></span>Phase 1: Searching Topics</div>
+        <div class="phase pending" id="vanilla-phase-2"><span class="phase-dot"></span>Phase 2: Summarizing Findings</div>
+        <div class="phase pending" id="vanilla-phase-3"><span class="phase-dot"></span>Phase 3: Generating Briefing</div>
+      </div>
+
+      <div id="vanillaError" class="error-section">
+        <strong>Error</strong>
+        <span id="vanillaErrorMsg"></span>
+      </div>
+
+      <div id="vanillaResult" class="result-section">
+        <div class="result-meta">
+          <span><strong>📅</strong> <span id="v-date"></span></span>
+          <span><strong>📊</strong> <span id="v-topics"></span> topics</span>
+          <span><strong>🔗</strong> <span id="v-sources"></span> sources</span>
+        </div>
+        <div class="briefing-text" id="v-text"></div>
+        <div class="topic-summaries">
+          <h3>📋 Topic Summaries</h3>
+          <div id="v-summaries"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Right: Temporal ── -->
+    <div class="column-card" id="temporalCol">
+      <div class="column-header">
+        <span class="badge badge-temporal">Temporal</span>
+        <h2>Durable Execution</h2>
+      </div>
+
+      <div id="temporalIdle" class="idle-placeholder">Hit Generate to start</div>
+
+      <div id="temporalMeta" class="temporal-meta">
+        <div><strong>Workflow ID</strong> — <a id="temporalUiLink" href="#" target="_blank">View in Temporal UI ↗</a></div>
+        <div class="workflow-id" id="temporalWorkflowId"></div>
+      </div>
+
+      <div id="temporalSpinner" class="spinner-wrap">
+        <div class="spinner"></div>
+        <div class="spinner-label" id="temporalSpinnerLabel">Starting...</div>
+      </div>
+
+      <div id="temporalPhases" class="phase-tracker" style="display:none">
+        <div class="phase pending" id="temporal-phase-1">
+          <span class="phase-dot"></span>
+          Phase 1: Searching Topics
+          <span class="retry-badge" id="retryBadge"></span>
+        </div>
+        <div class="phase pending" id="temporal-phase-2"><span class="phase-dot"></span>Phase 2: Summarizing Findings</div>
+        <div class="phase pending" id="temporal-phase-3"><span class="phase-dot"></span>Phase 3: Generating Briefing</div>
+      </div>
+
+      <div id="temporalError" class="error-section">
+        <strong>Error</strong>
+        <span id="temporalErrorMsg"></span>
+      </div>
+
+      <div id="temporalResult" class="result-section">
+        <div class="result-meta">
+          <span><strong>📅</strong> <span id="t-date"></span></span>
+          <span><strong>📊</strong> <span id="t-topics"></span> topics</span>
+          <span><strong>🔗</strong> <span id="t-sources"></span> sources</span>
+        </div>
+        <div class="briefing-text" id="t-text"></div>
+        <div class="topic-summaries">
+          <h3>📋 Topic Summaries</h3>
+          <div id="t-summaries"></div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /.columns -->
+
+  <script>
+    // ── Helpers ───────────────────────────────────────────────────────────────
 
     function parseTopics(text) {
-      return text
-        .split(/[\n,]/)
-        .map(t => t.trim())
-        .filter(t => t.length > 0);
+      return text.split(/[\n,]/).map(t => t.trim()).filter(Boolean);
     }
 
-    function showError(message) {
-      errorMessage.textContent = message;
-      formSection.classList.add('hidden');
-      loadingSection.classList.remove('active');
-      resultsSection.classList.remove('active');
-      errorSection.classList.add('active');
-    }
+    function show(el)  { el.style.display = ''; el.classList.add('visible'); }
+    function hide(el)  { el.style.display = 'none'; el.classList.remove('visible'); }
+    function block(el) { el.style.display = 'flex'; }
 
-    function resetToForm() {
-      formSection.classList.remove('hidden');
-      loadingSection.classList.remove('active');
-      resultsSection.classList.remove('active');
-      errorSection.classList.remove('active');
-      if (pollInterval) {
-        clearInterval(pollInterval);
-        pollInterval = null;
+    function updatePhaseTracker(prefix, progress) {
+      if (!progress) return;
+      progress.phases.forEach(p => {
+        const el = document.getElementById(`${prefix}-phase-${p.phase}`);
+        if (!el) return;
+        el.className = `phase ${p.status}`;
+        // Preserve inner HTML structure (dot + retry badge for phase 1)
+        const dot = el.querySelector('.phase-dot') || document.createElement('span');
+        dot.className = 'phase-dot';
+        const retryBadge = el.querySelector('.retry-badge');
+        el.innerHTML = '';
+        el.appendChild(dot);
+        el.appendChild(document.createTextNode(` Phase ${p.phase}: ${p.label}`));
+        if (retryBadge) el.appendChild(retryBadge);
+      });
+
+      // Retry badge (Temporal only)
+      const retryBadge = document.getElementById('retryBadge');
+      if (retryBadge && progress.retryCount > 0) {
+        retryBadge.textContent = `↺ Retried ${progress.retryCount}×`;
+        retryBadge.style.display = 'inline';
       }
     }
 
-    function displayResults(result) {
-      document.getElementById('resultDate').textContent = result.date;
-      document.getElementById('resultTopicsCount').textContent = result.topics.length;
-      document.getElementById('resultSourcesCount').textContent = result.totalSources;
-      document.getElementById('resultText').innerHTML = marked.parse(result.briefingText);
+    function renderResult(prefix, result) {
+      document.getElementById(`${prefix}-date`).textContent    = result.date;
+      document.getElementById(`${prefix}-topics`).textContent  = result.topics.length;
+      document.getElementById(`${prefix}-sources`).textContent = result.totalSources;
+      document.getElementById(`${prefix}-text`).innerHTML      = marked.parse(result.briefingText);
 
-      const summariesList = document.getElementById('topicSummariesList');
-      summariesList.innerHTML = '';
+      const summariesEl = document.getElementById(`${prefix}-summaries`);
+      summariesEl.innerHTML = '';
       result.topics.forEach(topic => {
         const card = document.createElement('div');
         card.className = 'topic-card';
@@ -405,82 +455,168 @@
           <p>${topic.summary}</p>
           <ul>${topic.keyPoints.map(p => `<li>${p}</li>`).join('')}</ul>
         `;
-        summariesList.appendChild(card);
+        summariesEl.appendChild(card);
       });
-
-      formSection.classList.add('hidden');
-      loadingSection.classList.remove('active');
-      errorSection.classList.remove('active');
-      resultsSection.classList.add('active');
     }
 
-    async function pollWorkflowStatus(workflowId) {
-      try {
-        const response = await fetch(`/api/briefing/status/${workflowId}`);
-        if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    // ── State ─────────────────────────────────────────────────────────────────
 
-        const data = await response.json();
+    let vanillaInterval  = null;
+    let temporalInterval = null;
+    let pendingCount     = 0;
+
+    const generateBtn = document.getElementById('generateBtn');
+
+    function onColumnDone() {
+      pendingCount--;
+      if (pendingCount === 0) generateBtn.disabled = false;
+    }
+
+    // ── Vanilla polling ───────────────────────────────────────────────────────
+
+    async function pollVanilla(jobId) {
+      try {
+        const res  = await fetch(`/api/vanilla/status/${jobId}`);
+        const data = await res.json();
+
+        // Update phase tracker
+        if (data.progress) {
+          document.getElementById('vanillaPhases').style.display = 'flex';
+          document.getElementById('vanillaPhases').style.flexDirection = 'column';
+          updatePhaseTracker('vanilla', data.progress);
+          const labels = ['Starting...', 'Searching topics...', 'Summarizing findings...', 'Generating briefing...'];
+          document.getElementById('vanillaSpinnerLabel').textContent = labels[data.progress.currentPhase] || 'Working...';
+        }
 
         if (data.status === 'completed') {
-          clearInterval(pollInterval);
-          pollInterval = null;
-          displayResults(data.result);
+          clearInterval(vanillaInterval);
+          hide(document.getElementById('vanillaSpinner'));
+          show(document.getElementById('vanillaResult'));
+          renderResult('v', data.result);
+          onColumnDone();
         } else if (data.status === 'failed') {
-          clearInterval(pollInterval);
-          pollInterval = null;
-          showError(`Workflow failed: ${data.error || 'Unknown error'}`);
+          clearInterval(vanillaInterval);
+          hide(document.getElementById('vanillaSpinner'));
+          document.getElementById('vanillaErrorMsg').textContent = data.error || 'Unknown error';
+          show(document.getElementById('vanillaError'));
+          onColumnDone();
         }
-      } catch (error) {
-        console.error('Error polling workflow status:', error);
+      } catch (err) {
+        console.error('Vanilla poll error:', err);
       }
     }
+
+    // ── Temporal polling ──────────────────────────────────────────────────────
+
+    async function pollTemporal(workflowId) {
+      try {
+        const res  = await fetch(`/api/briefing/status/${workflowId}`);
+        const data = await res.json();
+
+        if (data.progress) {
+          document.getElementById('temporalPhases').style.display = 'flex';
+          document.getElementById('temporalPhases').style.flexDirection = 'column';
+          updatePhaseTracker('temporal', data.progress);
+          const labels = ['Starting...', 'Searching topics...', 'Summarizing findings...', 'Generating briefing...'];
+          document.getElementById('temporalSpinnerLabel').textContent = labels[data.progress.currentPhase] || 'Working...';
+        }
+
+        if (data.status === 'completed') {
+          clearInterval(temporalInterval);
+          hide(document.getElementById('temporalSpinner'));
+          show(document.getElementById('temporalResult'));
+          renderResult('t', data.result);
+          onColumnDone();
+        } else if (data.status === 'failed') {
+          clearInterval(temporalInterval);
+          hide(document.getElementById('temporalSpinner'));
+          document.getElementById('temporalErrorMsg').textContent = data.error || 'Unknown error';
+          show(document.getElementById('temporalError'));
+          onColumnDone();
+        }
+      } catch (err) {
+        console.error('Temporal poll error:', err);
+      }
+    }
+
+    // ── Generate ──────────────────────────────────────────────────────────────
 
     async function startBriefing() {
-      const topicsText = topicsInput.value.trim();
-      if (!topicsText) { alert('Please enter at least one topic'); return; }
+      const topics = parseTopics(document.getElementById('topicsInput').value.trim());
+      if (topics.length === 0) { alert('Please enter at least one topic'); return; }
+      if (topics.length > 10)  { alert('Please enter no more than 10 topics'); return; }
 
-      const topics = parseTopics(topicsText);
-      if (topics.length === 0) { alert('Please enter at least one valid topic'); return; }
-      if (topics.length > 10) { alert('Please enter no more than 10 topics'); return; }
+      // Reset UI
+      generateBtn.disabled = true;
+      pendingCount = 2;
 
-      try {
-        formSection.classList.add('hidden');
-        loadingSection.classList.add('active');
+      ['vanillaIdle','vanillaError','vanillaResult'].forEach(id => hide(document.getElementById(id)));
+      ['temporalIdle','temporalError','temporalResult'].forEach(id => hide(document.getElementById(id)));
 
-        const response = await fetch('/api/briefing/start', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ topics }),
-        });
+      document.getElementById('vanillaPhases').style.display   = 'none';
+      document.getElementById('temporalPhases').style.display  = 'none';
 
-        if (!response.ok) {
-          const error = await response.json();
-          throw new Error(error.error || 'Failed to start workflow');
-        }
+      show(document.getElementById('vanillaSpinner'));
+      show(document.getElementById('temporalSpinner'));
 
-        const data = await response.json();
-        workflowIdDisplay.textContent = data.workflowId;
+      document.getElementById('vanillaSpinnerLabel').textContent  = 'Starting...';
+      document.getElementById('temporalSpinnerLabel').textContent = 'Starting...';
 
-        pollInterval = setInterval(() => pollWorkflowStatus(data.workflowId), 5000);
-        pollWorkflowStatus(data.workflowId);
-      } catch (error) {
-        showError(error.message);
+      // Reset phase classes
+      ['vanilla-phase-1','vanilla-phase-2','vanilla-phase-3',
+       'temporal-phase-1','temporal-phase-2','temporal-phase-3'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.className = 'phase pending';
+      });
+      const retryBadge = document.getElementById('retryBadge');
+      if (retryBadge) retryBadge.style.display = 'none';
+
+      hide(document.getElementById('temporalMeta'));
+
+      // Fire both simultaneously
+      const [vanillaRes, temporalRes] = await Promise.all([
+        fetch('/api/vanilla/start',   { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ topics }) }),
+        fetch('/api/briefing/start',  { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ topics }) }),
+      ]);
+
+      // Vanilla
+      if (!vanillaRes.ok) {
+        hide(document.getElementById('vanillaSpinner'));
+        document.getElementById('vanillaErrorMsg').textContent = 'Failed to start vanilla job';
+        show(document.getElementById('vanillaError'));
+        onColumnDone();
+      } else {
+        const { jobId } = await vanillaRes.json();
+        vanillaInterval = setInterval(() => pollVanilla(jobId), 3000);
+        pollVanilla(jobId);
+      }
+
+      // Temporal
+      if (!temporalRes.ok) {
+        hide(document.getElementById('temporalSpinner'));
+        document.getElementById('temporalErrorMsg').textContent = 'Failed to start Temporal workflow';
+        show(document.getElementById('temporalError'));
+        onColumnDone();
+      } else {
+        const { workflowId, temporalUiUrl } = await temporalRes.json();
+        document.getElementById('temporalWorkflowId').textContent = workflowId;
+        document.getElementById('temporalUiLink').href = temporalUiUrl;
+        show(document.getElementById('temporalMeta'));
+        temporalInterval = setInterval(() => pollTemporal(workflowId), 3000);
+        pollTemporal(workflowId);
       }
     }
 
-    generateBtn.addEventListener('click', startBriefing);
-    tryAgainBtn.addEventListener('click', resetToForm);
-    newBriefingBtn.addEventListener('click', resetToForm);
+    // ── Wire up ───────────────────────────────────────────────────────────────
 
-    topicsInput.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' && !e.shiftKey) {
-        e.preventDefault();
-        startBriefing();
-      }
+    document.getElementById('generateBtn').addEventListener('click', startBriefing);
+
+    document.getElementById('topicsInput').addEventListener('keydown', e => {
+      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); startBriefing(); }
     });
 
     window.addEventListener('load', () => {
-      topicsInput.value = [
+      document.getElementById('topicsInput').value = [
         'TypeScript and JavaScript updates',
         'AI and LLM developments',
         'Durable Execution news',
